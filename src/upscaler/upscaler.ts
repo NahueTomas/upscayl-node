@@ -30,7 +30,7 @@ export class Upscaler {
     options: UpscaleOptionsImageI,
   ) {
     if (!this.on) throw new UpscaleNotInitError();
-    this.driver.upscaleImage(imagePath, imageOutputPath, options);
+    return await this.driver.upscaleImage(imagePath, imageOutputPath, options);
   }
 
   async upscaleFolder(
@@ -39,7 +39,7 @@ export class Upscaler {
     options: UpscaleOptionsFolderI,
   ) {
     if (!this.on) throw new UpscaleNotInitError();
-    this.driver.upscaleFolder(imagePath, imageOutputPath, options);
+    return this.driver.upscaleFolder(imagePath, imageOutputPath, options);
   }
 
   addModel(model: Model): Model {

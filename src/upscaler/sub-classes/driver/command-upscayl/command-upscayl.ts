@@ -20,7 +20,7 @@ export class CommandUpscayl implements Driver {
     this.platform = platform;
 
     this.execPath = resolve(
-      join(__dirname, 'resources', platform!, 'bin', 'upscayl-bin'),
+      join(__dirname, 'resources', platform, 'bin', 'upscayl-bin'),
     );
   }
 
@@ -32,27 +32,35 @@ export class CommandUpscayl implements Driver {
     imageOutputPath: string,
     options: UpscaleOptionsImageI,
   ): Promise<string> {
-    const imageName = basename(imagePath);
-    const imageDefaultExt = extname(imageName);
+    return new Promise((resolve, reject): void => {
+      const imageName = basename(imagePath);
+      const imageDefaultExt = extname(imageName);
 
-    const command: string[] = this.generateArgs(imagePath, imageOutputPath, {
-      saveImageAs: options.saveImageAs || imageDefaultExt,
-      tileSize: options.tileSize || undefined,
-      customWidth: options.customWidth,
-      model: options.model,
-      compression: options.compression || 0,
-      scale: options.scale || 2,
+      const command: string[] = this.generateArgs(imagePath, imageOutputPath, {
+        saveImageAs: options.saveImageAs || imageDefaultExt,
+        tileSize: options.tileSize || undefined,
+        customWidth: options.customWidth,
+        model: options.model,
+        compression: options.compression || 0,
+        scale: options.scale || 2,
+      });
+      const spawn = this.runCommand(command);
+
+      spawn.process.stderr.on('data', (data) => {
+        const dataString = data.toString().trim();
+        if (dataString.includes('%')) {
+          const percent = dataString.slice(0, dataString.length - 1);
+          console.log(percent);
+        } else if (dataString.includes('Resizing')) {
+          console.log(dataString);
+        } else if (dataString.includes('Error')) {
+          spawn.kill();
+          reject();
+        }
+      });
+      spawn.process.on('error', (data) => reject(data.toString()));
+      spawn.process.on('close', () => resolve(imageOutputPath));
     });
-    const spawn = this.runCommand(command);
-
-    console.log(spawn.process.spawnargs);
-    spawn.process.stderr.on('data', (data) =>
-      console.log('data', data.toString()),
-    );
-    spawn.process.on('error', (data) => console.log('error', data.toString()));
-    spawn.process.on('close', () => console.log('close'));
-
-    return imageOutputPath;
   }
 
   // TODO: folderPath should be a dir
@@ -62,19 +70,38 @@ export class CommandUpscayl implements Driver {
     folderOutputPath: string,
     options: UpscaleOptionsFolderI,
   ): Promise<string> {
-    const imageDefaultExt = 'png';
+    return new Promise((resolve, reject): void => {
+      const imageDefaultExt = 'png';
 
-    const command: string[] = this.generateArgs(folderPath, folderOutputPath, {
-      saveImageAs: options.saveImageAs || imageDefaultExt,
-      tileSize: options.tileSize || undefined,
-      customWidth: options.customWidth,
-      model: options.model,
-      compression: options.compression || 0,
-      scale: options.scale || 2,
+      const command: string[] = this.generateArgs(
+        folderPath,
+        folderOutputPath,
+        {
+          saveImageAs: options.saveImageAs || imageDefaultExt,
+          tileSize: options.tileSize || undefined,
+          customWidth: options.customWidth,
+          model: options.model,
+          compression: options.compression || 0,
+          scale: options.scale || 2,
+        },
+      );
+
+      const spawn = this.runCommand(command);
+      spawn.process.stderr.on('data', (data) => {
+        const dataString = data.toString().trim();
+        if (dataString.includes('%')) {
+          const percent = dataString.slice(0, dataString.length - 1);
+          console.log(percent);
+        } else if (dataString.includes('Resizing')) {
+          console.log(dataString);
+        } else if (dataString.includes('Error')) {
+          spawn.kill();
+          reject();
+        }
+      });
+      spawn.process.on('error', (data) => reject(data.toString()));
+      spawn.process.on('close', () => resolve(folderOutputPath));
     });
-
-    this.runCommand(command);
-    return folderOutputPath;
   }
 
   private runCommand(command: string[]) {
