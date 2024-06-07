@@ -1,4 +1,4 @@
-import { dirname, join } from 'path';
+import { join } from 'path';
 import {
   Driver,
   UpscaleOptionsFolderI,
@@ -19,7 +19,7 @@ export class Upscaler {
   }
 
   public async init(): Promise<void> {
-    const modelsFolder = join(dirname(__dirname), 'upscaler', 'models');
+    const modelsFolder = join(__dirname, 'models');
     await this.modelManager.init(modelsFolder);
     this.on = true;
   }

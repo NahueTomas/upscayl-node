@@ -43,8 +43,15 @@ export class CommandUpscayl implements Driver {
       compression: options.compression || 0,
       scale: options.scale || 2,
     });
+    const spawn = this.runCommand(command);
 
-    this.runCommand(command);
+    console.log(spawn.process.spawnargs);
+    spawn.process.stderr.on('data', (data) =>
+      console.log('data', data.toString()),
+    );
+    spawn.process.on('error', (data) => console.log('error', data.toString()));
+    spawn.process.on('close', () => console.log('close'));
+
     return imageOutputPath;
   }
 
@@ -66,11 +73,7 @@ export class CommandUpscayl implements Driver {
       scale: options.scale || 2,
     });
 
-    const spawn = this.runCommand(command);
-    console.log(spawn.process);
-    setTimeout(() => {
-      spawn.kill();
-    }, 5000);
+    this.runCommand(command);
     return folderOutputPath;
   }
 
@@ -93,7 +96,7 @@ export class CommandUpscayl implements Driver {
     options: GenerateArgsOptionsI,
   ): string[] {
     const modelName = basename(options.model);
-    const modelDir = dirname(options.model);
+    const modelDir = resolve(dirname(options.model));
 
     const modelScale = getModelScale(modelName);
     const includeScale = modelScale !== options.scale && !options.customWidth;

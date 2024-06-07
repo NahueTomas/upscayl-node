@@ -1,6 +1,6 @@
 import { readdir } from 'fs/promises';
-import { basename, extname, join } from 'path';
 import { ModelManagerHasInitBefore } from './errors/model-manager-has-init-before-error';
+import { join } from 'path';
 
 export class ModelManager {
   private models: Model[] = [];
@@ -11,11 +11,19 @@ export class ModelManager {
 
     const files = await readdir(modelsFolder);
     files.forEach((file) => {
-      const modelName = basename(file);
-      const modelExt = extname(modelName);
-      if (modelExt !== '.bin') return null;
+      if (
+        file.endsWith('.param') ||
+        file.endsWith('.PARAM') ||
+        file.endsWith('.bin') ||
+        file.endsWith('.BIN')
+      ) {
+        const model = file.substring(0, file.lastIndexOf('.')) || file;
+        const resultModel = join(modelsFolder, model);
 
-      this.models.push(join(modelsFolder, modelName));
+        if (!this.models.includes(resultModel)) {
+          this.models.push(resultModel);
+        }
+      }
     });
 
     this.hasInit = true;
