@@ -1,5 +1,6 @@
-import { spawn } from 'child_process';
+import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
 import { basename, dirname, extname, join, resolve } from 'path';
+import { stdin } from 'process';
 
 import { getModelScale } from './utils/get-model-scale';
 
@@ -14,14 +15,21 @@ export class CommandUpscayl implements Driver {
   public platform: string;
   public architecture: string;
   private execPath: string;
+  private childProcesses: {
+    process: ChildProcessWithoutNullStreams;
+    kill: () => boolean;
+  }[];
 
   constructor(architecture: string, platform: string) {
     this.architecture = architecture;
     this.platform = platform;
+    this.childProcesses = [];
 
     this.execPath = resolve(
       join(__dirname, 'resources', platform, 'bin', 'upscayl-bin'),
     );
+
+    this.eventsOnExit();
   }
 
   // TODO: imagePath should be an image
@@ -45,6 +53,7 @@ export class CommandUpscayl implements Driver {
         scale: options.scale || 2,
       });
       const spawn = this.runCommand(command);
+      this.childProcesses.push(spawn);
 
       spawn.process.stderr.on('data', (data) => {
         const dataString = data.toString().trim();
@@ -59,7 +68,11 @@ export class CommandUpscayl implements Driver {
         }
       });
       spawn.process.on('error', (data) => reject(data.toString()));
-      spawn.process.on('close', () => resolve(imageOutputPath));
+      spawn.process.on('close', () => {
+        console.log('Folder ready');
+        spawn.kill();
+        resolve(imageOutputPath);
+      });
     });
   }
 
@@ -87,6 +100,7 @@ export class CommandUpscayl implements Driver {
       );
 
       const spawn = this.runCommand(command);
+      this.childProcesses.push(spawn);
       spawn.process.stderr.on('data', (data) => {
         const dataString = data.toString().trim();
         if (dataString.includes('%')) {
@@ -100,11 +114,18 @@ export class CommandUpscayl implements Driver {
         }
       });
       spawn.process.on('error', (data) => reject(data.toString()));
-      spawn.process.on('close', () => resolve(folderOutputPath));
+      spawn.process.on('close', () => {
+        console.log('Folder ready');
+        spawn.kill();
+        resolve(folderOutputPath);
+      });
     });
   }
 
-  private runCommand(command: string[]) {
+  private runCommand(command: string[]): {
+    process: ChildProcessWithoutNullStreams;
+    kill: () => boolean;
+  } {
     const spawnedProcess = spawn(
       this.execPath,
       command.filter((arg) => arg !== ''),
@@ -165,6 +186,27 @@ export class CommandUpscayl implements Driver {
       options.tileSize ? `-t` : '',
       options.tileSize ? options.tileSize.toString() : '',
     ];
+  }
+
+  private stopChildProcess() {
+    this.childProcesses.forEach((child) => {
+      child.kill();
+    });
+  }
+
+  private eventsOnExit() {
+    // Do something when app is closing
+    stdin.on('exit', () => this.stopChildProcess());
+
+    // Catches ctrl+c event
+    stdin.on('SIGINT', () => this.stopChildProcess());
+
+    // Catches "kill pid" (for example: nodemon restart)
+    stdin.on('SIGUSR1', () => this.stopChildProcess());
+    stdin.on('SIGUSR2', () => this.stopChildProcess());
+
+    // Catches uncaught exceptions
+    stdin.on('uncaughtException', () => this.stopChildProcess());
   }
 }
 
