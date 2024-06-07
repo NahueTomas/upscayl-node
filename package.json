@@ -7,7 +7,9 @@
     "start": "node ./dist/index.js",
     "start:dev": "ts-node-dev --respawn -- src/index.ts",
     "start:prod": "node ./dist/index.js",
-    "build": "tsc",
+    "build": "tsc && npm run build:models && npm run build:binaries",
+    "build:models": "copyfiles -u 1 src/upscaler/models/* dist/",
+    "build:binaries": "copyfiles -u 1 src/upscaler/sub-classes/driver/command-upscayl/resources/**/* dist/",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix"
   },
@@ -17,6 +19,7 @@
     "@types/node": "20.14.2",
     "@typescript-eslint/eslint-plugin": "7.12.0",
     "@typescript-eslint/parser": "7.12.0",
+    "copyfiles": "2.4.1",
     "eslint": "8.57.0",
     "eslint-config-prettier": "9.1.0",
     "eslint-plugin-prettier": "5.1.3",
