@@ -12,7 +12,7 @@
     "build:binaries": "copyfiles -u 1 src/upscaler/sub-classes/driver/command-upscayl/resources/**/* dist/",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix"
   },
-  "license": "ISC",
+  "license": "AGPL-3.0",
   "devDependencies": {
     "@types/express": "4.17.21",
     "@types/node": "20.14.2",
