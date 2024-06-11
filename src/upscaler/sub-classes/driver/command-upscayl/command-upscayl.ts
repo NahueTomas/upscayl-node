@@ -110,7 +110,7 @@ export class CommandUpscayl implements Driver {
           console.log(dataString);
         } else if (dataString.includes('Error')) {
           spawn.kill();
-          reject();
+          reject(dataString);
         }
       });
       spawn.process.on('error', (data) => reject(data.toString()));
