@@ -1,11 +1,11 @@
-import { UpscaleError } from '../../../errors/upscale-error';
+import { UpscalerError } from '../../../errors/upscaler-error';
 
-export class ModelManagerHasInitBefore extends UpscaleError {
+export class ModelManagerHasInitBefore extends UpscalerError {
   constructor() {
     super(
       'The "modelManager.init()" has been executed before, it can happend only once',
-      'model-manager',
     );
+    this.where = 'model-manager';
 
     // Set the prototype explicitly.
     Object.setPrototypeOf(this, ModelManagerHasInitBefore.prototype);

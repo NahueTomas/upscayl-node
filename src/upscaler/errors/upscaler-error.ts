@@ -1,4 +1,4 @@
-export class UpscaleError extends Error {
+export class UpscalerError extends Error {
   public where: string;
 
   constructor(message: string) {
@@ -6,6 +6,6 @@ export class UpscaleError extends Error {
     this.where = 'upscaler';
 
     // Set the prototype explicitly.
-    Object.setPrototypeOf(this, UpscaleError.prototype);
+    Object.setPrototypeOf(this, UpscalerError.prototype);
   }
 }

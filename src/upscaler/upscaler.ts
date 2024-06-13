@@ -2,13 +2,13 @@ import { basename, extname, join } from 'path';
 import { stat } from 'fs/promises';
 
 import { Driver, UpscaleOptionsI } from './sub-classes/driver/driver';
-import { UpscaleNotInitError } from './errors/upscale-not-init-error';
+import { UpscalerNotInitError } from './errors/upscaler-not-init-error';
 import { Model, ModelManager } from './sub-classes/model-manager/model-manager';
-import { UpscaleImageFormatError } from './errors/upscale-image-format-error';
-import { UpscalBadOptionFieldError } from './errors/upscale-bad-option-field-error';
-import { UpscaleShouldBeImage } from './errors/upscale-should-be-an-image';
-import { UpscaleImagePathError } from './errors/upscale-image-path-error';
-import { UpscaleError } from './errors/upscale-error';
+import { UpscalerImageFormatError } from './errors/upscaler-image-format-error';
+import { UpscalerBadOptionFieldError } from './errors/upscaler-bad-option-field-error';
+import { UpscalerShouldBeImage } from './errors/upscaler-should-be-an-image';
+import { UpscalerImagePathError } from './errors/upscaler-image-path-error';
+import { UpscalerError } from './errors/upscaler-error';
 
 export class Upscaler {
   private driver: Driver;
@@ -33,7 +33,7 @@ export class Upscaler {
     options?: UpscaleUpscalerOptionsI,
   ) {
     // Check that upscaler has been init
-    if (!this.on) throw new UpscaleNotInitError();
+    if (!this.on) throw new UpscalerNotInitError();
 
     // ===== CHECK imagePath =====
     // Check that the path imagePath is valid
@@ -41,17 +41,17 @@ export class Upscaler {
     const imageExt = extname(imagePathFileName);
 
     if (imageExt !== '.png' && imageExt !== '.jpg' && imageExt !== '.webp')
-      throw new UpscaleShouldBeImage('imageOutputPath', imagePath);
+      throw new UpscalerShouldBeImage('imageOutputPath', imagePath);
 
     // Check that image exists
     const statImagePath = await stat(imagePath).catch((error) => {
-      if (error?.code === 'ENOENT') throw new UpscaleImagePathError(imagePath);
-      else throw new UpscaleError(error.message);
+      if (error?.code === 'ENOENT') throw new UpscalerImagePathError(imagePath);
+      else throw new UpscalerError(error.message);
     });
 
     // Check that image is a file
     if (!statImagePath.isFile())
-      throw new UpscaleShouldBeImage('imagePath', imagePath);
+      throw new UpscalerShouldBeImage('imagePath', imagePath);
 
     // ===== CHECK imageOutputPath =====
     // Check image extension and if exists
@@ -63,10 +63,10 @@ export class Upscaler {
       imageOutputExt !== '.jpg' &&
       imageOutputExt !== '.webp'
     )
-      throw new UpscaleShouldBeImage('imageOutputPath', imageOutputPath);
+      throw new UpscalerShouldBeImage('imageOutputPath', imageOutputPath);
 
     if (!basename(imageOutputPath))
-      throw new UpscaleShouldBeImage('imageOutputPath', imageOutputPath);
+      throw new UpscalerShouldBeImage('imageOutputPath', imageOutputPath);
 
     // Get options
     const optionsResult = this.getOptions(options);
@@ -83,7 +83,7 @@ export class Upscaler {
 
   getModels(): Model[] {
     // Check that upscaler has been init
-    if (!this.on) throw new UpscaleNotInitError();
+    if (!this.on) throw new UpscalerNotInitError();
     return this.modelManager.getModels();
   }
 
@@ -99,23 +99,23 @@ export class Upscaler {
 
     // Options error handling
     if (isNaN(Number(opt.scale)))
-      throw new UpscalBadOptionFieldError('scale', 'number');
+      throw new UpscalerBadOptionFieldError('scale', 'number');
 
     if (
       opt.saveImageAs !== 'jpg' &&
       opt.saveImageAs !== 'webp' &&
       opt.saveImageAs !== 'png'
     )
-      throw new UpscaleImageFormatError();
+      throw new UpscalerImageFormatError();
 
     if (opt.compression && isNaN(Number(opt.compression)))
-      throw new UpscalBadOptionFieldError('compression', 'number');
+      throw new UpscalerBadOptionFieldError('compression', 'number');
 
     if (opt.tileSize && isNaN(Number(opt.tileSize)))
-      throw new UpscalBadOptionFieldError('tileSize', 'number');
+      throw new UpscalerBadOptionFieldError('tileSize', 'number');
 
     if (opt.customWidth && isNaN(Number(opt.customWidth)))
-      throw new UpscalBadOptionFieldError('customWidth', 'number');
+      throw new UpscalerBadOptionFieldError('customWidth', 'number');
 
     return opt;
   }

@@ -1,6 +1,6 @@
-import { UpscaleError } from './upscale-error';
+import { UpscalerError } from './upscaler-error';
 
-export class UpscaleShouldBeImage extends UpscaleError {
+export class UpscalerShouldBeImage extends UpscalerError {
   private path: string;
 
   constructor(name: string, path: string) {
@@ -8,6 +8,6 @@ export class UpscaleShouldBeImage extends UpscaleError {
     this.path = path;
 
     // Set the prototype explicitly.
-    Object.setPrototypeOf(this, UpscaleShouldBeImage.prototype);
+    Object.setPrototypeOf(this, UpscalerShouldBeImage.prototype);
   }
 }

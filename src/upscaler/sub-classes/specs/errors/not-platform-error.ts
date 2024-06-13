@@ -1,8 +1,9 @@
-import { UpscaleError } from '../../../errors/upscale-error';
+import { UpscalerError } from '../../../errors/upscaler-error';
 
-export class SpecsNotPlatformError extends UpscaleError {
+export class SpecsNotPlatformError extends UpscalerError {
   constructor() {
-    super('Platform not found, device not compatible', 'specs');
+    super('Platform not found, device not compatible');
+    this.where = 'specs';
 
     // Set the prototype explicitly.
     Object.setPrototypeOf(this, SpecsNotPlatformError.prototype);
