@@ -4,7 +4,6 @@ import { stat } from 'fs/promises';
 import { Driver, UpscaleOptionsI } from './sub-classes/driver/driver';
 import { UpscalerNotInitError } from './errors/upscaler-not-init-error';
 import { Model, ModelManager } from './sub-classes/model-manager/model-manager';
-import { UpscalerImageFormatError } from './errors/upscaler-image-format-error';
 import { UpscalerBadOptionFieldError } from './errors/upscaler-bad-option-field-error';
 import { UpscalerShouldBeImage } from './errors/upscaler-should-be-an-image';
 import { UpscalerImagePathError } from './errors/upscaler-image-path-error';
@@ -27,11 +26,11 @@ export class Upscaler {
     this.on = true;
   }
 
-  async upscaleImage(
+  public async upscaleImage(
     imagePath: string,
     imageOutputPath: string,
     options?: UpscaleUpscalerOptionsI,
-  ) {
+  ): Promise<string> {
     // Check that upscaler has been init
     if (!this.on) throw new UpscalerNotInitError();
 
@@ -57,11 +56,12 @@ export class Upscaler {
     // Check image extension and if exists
     const imageOutputPathFileName = basename(imageOutputPath);
     const imageOutputExt = extname(imageOutputPathFileName);
+    const imageOutputExtWithoutPoint = imageOutputExt?.split('.')?.[0];
 
     if (
-      imageOutputExt !== '.png' &&
-      imageOutputExt !== '.jpg' &&
-      imageOutputExt !== '.webp'
+      imageOutputExtWithoutPoint !== 'png' &&
+      imageOutputExtWithoutPoint !== 'jpg' &&
+      imageOutputExtWithoutPoint !== 'webp'
     )
       throw new UpscalerShouldBeImage('imageOutputPath', imageOutputPath);
 
@@ -75,23 +75,26 @@ export class Upscaler {
     return await this.driver.upscale(imagePath, imageOutputPath, optionsResult);
   }
 
-  addModel(model: Model): Model {
+  public addModel(model: Model): Model {
     const modelAdded = this.modelManager.addModel(model);
     this.on = true;
     return modelAdded;
   }
 
-  getModels(): Model[] {
+  public getModels(): Model[] {
     // Check that upscaler has been init
     if (!this.on) throw new UpscalerNotInitError();
     return this.modelManager.getModels();
   }
 
-  getOptions(options?: UpscaleUpscalerOptionsI): UpscaleOptionsI {
+  private getOptions(
+    options?: UpscaleUpscalerOptionsI,
+    imageOutputExt?: ImageExt | undefined,
+  ): UpscaleOptionsI {
     const opt = {
       model: options?.model ? options.model.toString() : this.getModels()[0],
       scale: options?.scale || 2,
-      saveImageAs: options?.saveImageAs || 'png',
+      saveImageAs: imageOutputExt || 'png',
       compression: options?.compression || 0,
       tileSize: options?.tileSize,
       customWidth: options?.customWidth,
@@ -100,13 +103,6 @@ export class Upscaler {
     // Options error handling
     if (isNaN(Number(opt.scale)))
       throw new UpscalerBadOptionFieldError('scale', 'number');
-
-    if (
-      opt.saveImageAs !== 'jpg' &&
-      opt.saveImageAs !== 'webp' &&
-      opt.saveImageAs !== 'png'
-    )
-      throw new UpscalerImageFormatError();
 
     if (opt.compression && isNaN(Number(opt.compression)))
       throw new UpscalerBadOptionFieldError('compression', 'number');
@@ -126,7 +122,6 @@ interface UpscaleUpscalerOptionsI {
   scale?: number;
   tileSize?: number;
   compression?: number;
-  saveImageAs?: ImageExt;
   customWidth?: number;
 }
 
