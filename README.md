@@ -41,11 +41,6 @@ Installation is done using the
 $ npm install upscayl-node
 ```
 
-### Upscale image example
-
-Import module and start to use it.
-
-
 # API reference
 ## Methods
 ### upscaler.init(): Promise<"void">

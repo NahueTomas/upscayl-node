@@ -1,6 +1,6 @@
 {
   "name": "upscayl-node",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "Upscale node package based on upscayl",
   "main": "dist/index.ts",
   "scripts": {
