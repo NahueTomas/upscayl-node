@@ -56,7 +56,7 @@ export class Upscaler {
     // Check image extension and if exists
     const imageOutputPathFileName = basename(imageOutputPath);
     const imageOutputExt = extname(imageOutputPathFileName);
-    const imageOutputExtWithoutPoint = imageOutputExt?.split('.')?.[0];
+    const imageOutputExtWithoutPoint = imageOutputExt?.split('.')?.[1];
 
     if (
       imageOutputExtWithoutPoint !== 'png' &&
