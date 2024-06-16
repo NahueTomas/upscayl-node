@@ -3,13 +3,13 @@ Upscayl node prepares the [UPSCAYL CORE](https://github.com/upscayl/upscayl) to 
 
 ```javascript
 import { join } from "path"
-import upscaler from 'upscayl-node';
+import { upscaler } from 'upscayl-node';
 
 const run = async () => {
   await upscaler.init();
 
   const outputImagePath = await upscaler.upscaleImage(
-    join(__dirname, "./image-test.png")
+    join(__dirname, "./image-test.png"),
     join(__dirname, "./image-test-result.png")
   );
 };
@@ -70,7 +70,7 @@ const run = async () => {
 
   // Once we have the upscaler with models loaded we can run it
   const outputImagePath = upscaler.upscaleImage(
-    join(__dirname, "./image-test.png") // Absolute path from image to be upscaled
+    join(__dirname, "./image-test.png"),       // Absolute path from image to be upscaled
     join(__dirname, "./image-test-result.png") // Absolute path from image upscaled
   );
 };
