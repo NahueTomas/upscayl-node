@@ -10,5 +10,4 @@ const platform = specs.getPlatform();
 const modelManager = new ModelManager();
 const commandUpscayl = new CommandUpscayl(arch, platform);
 
-const upscaler = new Upscaler(commandUpscayl, modelManager);
-export default upscaler;
+export const upscaler = new Upscaler(commandUpscayl, modelManager);
