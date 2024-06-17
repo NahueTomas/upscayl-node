@@ -2,8 +2,8 @@
 Upscayl node prepares the [UPSCAYL CORE](https://github.com/upscayl/upscayl) to run in NodeJS.
 
 ```javascript
-import { join } from "path"
-import { upscaler } from 'upscayl-node';
+const { join } = require("path");
+const { upscaler } = require("upscayl-node");
 
 const run = async () => {
   await upscaler.init();
@@ -44,19 +44,20 @@ $ npm install upscayl-node
 # API reference
 ## Methods
 ### upscaler.init(): Promise<"void">
-This method lets you to load the default models.
+This method allows you to load the default AI models.
 
 ### upscaler.getModels(): model[]
-This method lets you to get the models' path. It is util if you want to change the default model that upscale the image.
+This method allows you to obtain the path of the models. It is useful if you want to change the default model that upscales the image.
 
 ### upscaler.addModel(model: Model): Model
-This method lets you to add a path where you have a custom model to the models' list.
+This method allows you to add a path where you have a custom model to the list of models.
 
 ### upscaler.upscaleImage(imagePath, imageOutputPathd, options?): Promise<"string">
-This mehod allow you to upscale images with different custom options.
+This method allows you to upscale an image with various custom options.
+
 ```javascript
-import { join } from "path"
-import { upscaler } from 'upscayl-node';
+const { join } = require("path");
+const { upscaler } = require("upscayl-node");
 
 const run = async () => {
   // You have to init it.
@@ -74,16 +75,16 @@ run();
 ```
 
 #### imagePath
-Absolute image path of the image to be upscaled. It only accepts png, jpg or webp images.
+Absolute image path of the image to be upscaled. Only png, jpg or webp images are accepted.
 
 #### imageOutputPath
-Absolute image path of the result image. You can choose a different image extension changing the image format of the original if you want. Only png, jpg or webp are allowed. 
+Absolute image path of the resulting image. You can choose a different image extension, which will change the image format of the original if you wish. Only png, jpg or webp are allowed.
 
 #### options
 
 | Property | Description | Type | Default
 | -------- | ----------- | ---- | -------
-| model    | Path of model to be used to upscale the image | string | upscaler.getModels()[0]
-| scale    | Defines the scale that the image result will have based to the original image | number | 2
-| compression | Define the final image compression | number | 0 
-| tileSize | Define the final tile size image | number | 0 
+| model    | Absolute path of the model used to upscale the image. | string | upscaler.getModels()[0]
+| scale    | Specifies the scale of the resulting image relative to the original image. | number | 2
+| compression | Set the final image compression. | number | 0 
+| tileSize | Define the final tile size of the image. | number | 0 
