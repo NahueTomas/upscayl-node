@@ -1,8 +1,6 @@
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
 import { basename, dirname, extname, join, resolve } from 'path';
 
-import { SingleBar, Presets } from 'cli-progress';
-
 import { getModelScale } from './utils/get-model-scale';
 
 import { type Driver, type UpscaleOptionsI } from '../driver';
@@ -37,11 +35,6 @@ export class CommandUpscayl implements Driver {
       const imageName = basename(imagePath);
       const imageDefaultExt = extname(imageName);
 
-      const bar = new SingleBar({}, Presets.legacy);
-      bar.start(100, 0, {
-        speed: 0,
-      });
-
       const command: string[] = this.generateArgs(imagePath, imageOutputPath, {
         saveImageAs: options.saveImageAs || imageDefaultExt,
         tileSize: options.tileSize,
@@ -56,29 +49,18 @@ export class CommandUpscayl implements Driver {
       spawn.process.stderr.on('data', (data) => {
         const dataString = data.toString().trim();
         if (dataString.includes('%')) {
-          const percent = dataString
-            .slice(0, dataString.length - 1)
-            ?.split(',')[0];
-          bar.update(Number(percent));
-          if (percent === 100) bar.stop();
         } else if (dataString.includes('Resizing')) {
-          bar.update(100);
-          bar.stop();
-          console.log(dataString);
         } else if (dataString.includes('Error')) {
           spawn.kill();
-          bar.stop();
           reject(dataString);
         }
       });
       spawn.process.on('error', (data) => {
         spawn.kill();
-        bar.stop();
         reject(data.toString());
       });
       spawn.process.on('close', () => {
         spawn.kill();
-        bar.stop();
         resolve(imageOutputPath);
       });
     });
