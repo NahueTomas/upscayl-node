@@ -1,6 +1,6 @@
 {
   "name": "upscayl-node",
-  "version": "1.4.6",
+  "version": "2.0.0",
   "description": "Upscale node package based on upscayl",
   "main": "dist/index.ts",
   "scripts": {
@@ -10,7 +10,8 @@
     "build": "tsc && npm run build:models && npm run build:binaries",
     "build:models": "copyfiles -u 1 src/upscaler/models/* dist/",
     "build:binaries": "copyfiles -u 1 src/upscaler/sub-classes/driver/command-upscayl/resources/**/* dist/",
-    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix"
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "postinstall": "chmod +x ./dist/upscaler/sub-classes/driver/command-upscayl/resources/mac/bin/upscayl-bin && chmod +x ./dist/upscaler/sub-classes/driver/command-upscayl/resources/linux/bin/upscayl-bin"
   },
   "author": "Nahuel Tomás Rodriguez",
   "license": "AGPL-3.0",
