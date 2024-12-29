@@ -2,4 +2,4 @@
 .eslintrc.js
 .gitignore
 .prettierrc
-tsconfig.jsons
+tsconfig.json
