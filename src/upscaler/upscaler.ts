@@ -2,7 +2,6 @@ import { basename, extname, join } from 'path';
 import { stat } from 'fs/promises';
 
 import { Driver, UpscaleOptionsI } from './sub-classes/driver/driver';
-import { UpscalerNotInitError } from './errors/upscaler-not-init-error';
 import { Model, ModelManager } from './sub-classes/model-manager/model-manager';
 import { UpscalerBadOptionFieldError } from './errors/upscaler-bad-option-field-error';
 import { UpscalerShouldBeImage } from './errors/upscaler-should-be-an-image';
@@ -17,13 +16,6 @@ export class Upscaler {
   constructor(driver: Driver, modelManager: ModelManager) {
     this.driver = driver;
     this.modelManager = modelManager;
-    this.on = false;
-  }
-
-  public async init(): Promise<void> {
-    const modelsFolder = join(__dirname, 'models');
-    await this.modelManager.init(modelsFolder);
-    this.on = true;
   }
 
   public async upscaleImage(
@@ -31,9 +23,6 @@ export class Upscaler {
     imageOutputPath: string,
     options?: UpscaleUpscalerOptionsI,
   ): Promise<string> {
-    // Check that upscaler has been init
-    if (!this.on) throw new UpscalerNotInitError();
-
     // ===== CHECK imagePath =====
     // Check that the path imagePath is valid
     const imagePathFileName = basename(imagePath);
@@ -77,13 +66,11 @@ export class Upscaler {
 
   public addModel(model: Model): Model {
     const modelAdded = this.modelManager.addModel(model);
-    this.on = true;
     return modelAdded;
   }
 
   public getModels(): Model[] {
     // Check that upscaler has been init
-    if (!this.on) throw new UpscalerNotInitError();
     return this.modelManager.getModels();
   }
 

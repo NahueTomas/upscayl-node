@@ -6,8 +6,6 @@ const { join } = require("path");
 const { upscaler } = require("upscayl-node");
 
 const run = async () => {
-  await upscaler.init();
-
   const outputImagePath = await upscaler.upscaleImage(
     join(__dirname, "./image-test.png"),
     join(__dirname, "./image-test-result.png")
@@ -52,7 +50,7 @@ This method allows you to obtain the path of the models. It is useful if you wan
 ### upscaler.addModel(model: Model): Model
 This method allows you to add a path where you have a custom model to the list of models.
 
-### upscaler.upscaleImage(imagePath, imageOutputPathd, options?): Promise<"string">
+### upscaler.upscaleImage(imagePath, imageOutputPath, options?): Promise<"string">
 This method allows you to upscale an image with various custom options.
 
 ```javascript
@@ -60,12 +58,8 @@ const { join } = require("path");
 const { upscaler } = require("upscayl-node");
 
 const run = async () => {
-  // You have to init it.
-  // Note: the init method lets you to load AI models
-  await upscaler.init();
-
   // Once we have the upscaler with models loaded we can run it
-  const outputImagePath = upscaler.upscaleImage(
+  const outputImagePath = await upscaler.upscaleImage(
     join(__dirname, "./image-test.png"),       // Absolute path from image to be upscaled
     join(__dirname, "./image-test-result.png") // Absolute path from image upscaled
   );
@@ -84,7 +78,7 @@ Absolute image path of the resulting image. You can choose a different image ext
 
 | Property | Description | Type | Default
 | -------- | ----------- | ---- | -------
-| model    | Absolute path of the model used to upscale the image. | string | upscaler.getModels()[0]
+| model    | Absolute path of the model used to upscale the image. | string | `upscaler.getModels()[0]`
 | scale    | Specifies the scale of the resulting image relative to the original image. | number | 2
 | compression | Set the final image compression. | number | 0 
 | tileSize | Define the final tile size of the image. | number | 0 
