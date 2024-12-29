@@ -4,7 +4,6 @@ export class ModelManager {
   private models: Model[] = [
     join(__dirname, "models", "realesrgan-x4fast"),
     join(__dirname, "models", "realesrgan-x4plus"),
-    join(__dirname, "models", "remacri"),
   ];
 
   public addModel(model: Model): Model {
